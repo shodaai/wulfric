@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    int priority;
+    struct Node* next;
+};
+
+struct Node* newNode(int d, int p) {
+    struct Node* temp = (struct Node*)malloc(sizeof(struct Node));
+    temp->data = d;
+    temp->priority = p;
+    temp->next = NULL;
+    return temp;
+}
+
+int isEmpty(struct Node** head) {
+    return (*head) == NULL;
+}
+
+void insert(struct Node** head, int d, int p) {
+    struct Node* start = (*head);
+    struct Node* temp = newNode(d, p);
+
+    if ((*head) == NULL || p < (*head)->priority) {
+        temp->next = *head;
+        (*head) = temp;
+    } else {
+        while (start->next != NULL && start->next->priority <= p) {
+            start = start->next;
+        }
+        temp->next = start->next;
+        start->next = temp;
+    }
+}
+
+void dequeue(struct Node** head) {
+    if ((*head) == NULL) {
+        printf("Queue is empty\n");
+        return;
+    }
+    struct Node* temp = *head;
+    (*head) = (*head)->next;
+    free(temp);
+}
+
+int peek(struct Node** head) {
+    return (*head)->data;
+}
+
+void display(struct Node** head) {
+    struct Node* temp = *head;
+    while (temp != NULL) {
+        printf("(%d, %d) ", temp->data, temp->priority);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, data, priority;
+
+    do {
+        printf("\nPriority Queue Menu\n");
+        printf("1. Insert\n");
+        printf("2. Dequeue\n");
+        printf("3. Peek\n");
+        printf("4. Display\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data and priority to insert: ");
+                scanf("%d %d", &data, &priority);
+                insert(&head, data, priority);
+                break;
+            case 2:
+                dequeue(&head);
+                break;
+            case 3:
+                if (!isEmpty(&head)) {
+                    printf("Highest priority element: %d\n", peek(&head));
+                } else {
+                    printf("Queue is empty\n");
+                }
+                break;
+            case 4:
+                printf("Priority queue elements: ");
+                if (!isEmpty(&head)) {
+                    display(&head);
+                } else {
+                    printf("Queue is empty\n");
+                }
+                break;
+            case 5:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice\n");
+        }
+    } while (choice != 5);
+
+    return 0;
+}
