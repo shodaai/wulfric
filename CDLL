@@ -1,0 +1,289 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure for the doubly linked list
+typedef struct Node {
+    int data;
+    struct Node *prev;
+    struct Node *next;
+} Node;
+
+// Function to create a new node
+Node* createNode(int data) {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert a node by order
+void insertByOrder(Node** head, int data) {
+    Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        (*head)->prev = *head;
+        (*head)->next = *head;
+        return;
+    }
+    Node* current = *head;
+    while (current->next != *head && current->next->data < data) {
+        current = current->next;
+    }
+    newNode->next = current->next;
+    newNode->prev = current;
+    current->next->prev = newNode;
+    current->next = newNode;
+    if (newNode->data < (*head)->data) {
+        *head = newNode;
+    }
+}
+
+// Function to delete a node by position
+void deleteByPosition(Node** head, int position) {
+    if (*head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    Node* current = *head;
+    Node* temp;
+    int count = 1;
+    if (position == 1) {
+        temp = *head;
+        (*head)->prev->next = (*head)->next;
+        (*head)->next->prev = (*head)->prev;
+        *head = (*head)->next;
+        free(temp);
+        return;
+    }
+    while (count < position - 1 && current->next != *head) {
+        current = current->next;
+        count++;
+    }
+    if (current->next == *head && count != position - 1) {
+        printf("Position not found\n");
+        return;
+    }
+    temp = current->next;
+    current->next = temp->next;
+    temp->next->prev = current;
+    free(temp);
+}
+
+// Function to delete a node by key
+void deleteByKey(Node** head, int key) {
+    if (*head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    Node* current = *head;
+    Node* temp;
+    if ((*head)->data == key) {
+        temp = *head;
+        (*head)->prev->next = (*head)->next;
+        (*head)->next->prev = (*head)->prev;
+        *head = (*head)->next;
+        free(temp);
+        return;
+    }
+    while (current->next != *head && current->next->data != key) {
+        current = current->next;
+    }
+    if (current->next == *head && current->next->data != key) {
+        printf("Key not found\n");
+        return;
+    }
+    temp = current->next;
+    current->next = temp->next;
+    temp->next->prev = current;
+    free(temp);
+}
+
+// Function to search for a node by position
+Node* searchByPosition(Node* head, int position) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return NULL;
+    }
+    Node* current = head;
+    int count = 1;
+    while (count < position && current->next != head) {
+        current = current->next;
+        count++;
+    }
+    if (count != position) {
+        printf("Position not found\n");
+        return NULL;
+    }
+    return current;
+}
+
+// Function to search for a node by key
+Node* searchByKey(Node* head, int key) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return NULL;
+    }
+    Node* current = head;
+    while (current->data != key && current->next != head) {
+        current = current->next;
+    }
+    if (current->data != key) {
+        printf("Key not found\n");
+        return NULL;
+    }
+    return current;
+}
+
+// Function to insert a node at the front
+void insertFront(Node** head, int data) {
+    Node* newNode = createNode(data);
+    if (*head == NULL) {
+        *head = newNode;
+        (*head)->prev = *head;
+        (*head)->next = *head;
+        return;
+    }
+    newNode->next = *head;
+    newNode->prev = (*head)->prev;
+    (*head)->prev->next = newNode;
+    (*head)->prev = newNode;
+    *head = newNode;
+}
+
+// Function to insert a node at the rear
+void insertRear(Node** head, int data) {
+    if (*head == NULL) {
+        insertFront(head, data);
+        return;
+    }
+    Node* newNode = createNode(data);
+    newNode->next = *head;
+    newNode->prev = (*head)->prev;
+    (*head)->prev->next = newNode;
+    (*head)->prev = newNode;
+}
+
+// Function to delete the rear node
+void deleteRear(Node** head) {
+    if (*head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    Node* temp = (*head)->prev;
+    temp->prev->next = *head;
+    (*head)->prev = temp->prev;
+    free(temp);
+}
+
+// Function to delete the front node
+void deleteFront(Node** head) {
+    if (*head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    Node* temp = *head;
+    (*head)->prev->next = (*head)->next;
+    (*head)->next->prev = (*head)->prev;
+    *head = (*head)->next;
+    free(temp);
+}
+
+// Function to display the circular doubly linked list
+void displayList(Node* head) {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    Node* current = head;
+    do {
+        printf("%d ", current->data);
+        current = current->next;
+    } while (current != head);
+    printf("\n");
+}
+
+int main() {
+    Node* head = NULL;
+    int choice, data, position, key;
+    
+    do {
+        printf("\nCircular Doubly Linked List Menu:\n");
+        printf("1. Insert by order\n");
+        printf("2. Delete by position\n");
+        printf("3. Delete by key\n");
+        printf("4. Search by position\n");
+        printf("5. Insert front\n");
+        printf("6. Insert rear\n");
+        printf("7. Delete rear\n");
+        printf("8. Delete front\n");
+        printf("9. Display list\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d",                &data);
+                insertByOrder(&head, data);
+                printf("Node inserted by order\n");
+                break;
+            case 2:
+                printf("Enter position to delete: ");
+                scanf("%d", &position);
+                deleteByPosition(&head, position);
+                printf("Node deleted by position\n");
+                break;
+            case 3:
+                printf("Enter key to delete: ");
+                scanf("%d", &key);
+                deleteByKey(&head, key);
+                printf("Node deleted by key\n");
+                break;
+            case 4:
+                printf("Enter position to search: ");
+                scanf("%d", &position);
+                Node* searchedNode = searchByPosition(head, position);
+                if (searchedNode != NULL)
+                    printf("Node found at position %d with data %d\n", position, searchedNode->data);
+                break;
+            case 5:
+                printf("Enter data to insert at front: ");
+                scanf("%d", &data);
+                insertFront(&head, data);
+                printf("Node inserted at front\n");
+                break;
+            case 6:
+                printf("Enter data to insert at rear: ");
+                scanf("%d", &data);
+                insertRear(&head, data);
+                printf("Node inserted at rear\n");
+                break;
+            case 7:
+                deleteRear(&head);
+                printf("Rear node deleted\n");
+                break;
+            case 8:
+                deleteFront(&head);
+                printf("Front node deleted\n");
+                break;
+            case 9:
+                printf("Current Circular Doubly Linked List: ");
+                displayList(head);
+                break;
+            case 0:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice! Please enter a valid option.\n");
+        }
+    } while (choice != 0);
+
+    return 0;
+}
+
