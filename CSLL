@@ -1,0 +1,333 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node structure
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Circular singly linked list structure
+struct CircularSinglyLinkedList {
+    struct Node* head;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    if (newNode == NULL) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to initialize a circular singly linked list
+void initCircularSinglyLinkedList(struct CircularSinglyLinkedList* list) {
+    list->head = NULL;
+}
+
+// Function to insert a node by order
+void insertByOrder(struct CircularSinglyLinkedList* list, int data) {
+    struct Node* newNode = createNode(data);
+    if (list->head == NULL || list->head->data >= data) {
+        newNode->next = list->head;
+        list->head = newNode;
+    } else {
+        struct Node* current = list->head;
+        while (current->next != NULL && current->next->data < data) {
+            current = current->next;
+        }
+        newNode->next = current->next;
+        current->next = newNode;
+    }
+}
+
+// Function to delete a node by position
+void deleteByPosition(struct CircularSinglyLinkedList* list, int position) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = list->head;
+    if (position == 0) {
+        while (temp->next != list->head) {
+            temp = temp->next;
+        }
+        temp->next = list->head->next;
+        free(list->head);
+        list->head = temp->next;
+    } else {
+        struct Node* current = list->head;
+        for (int i = 0; i < position - 1; i++) {
+            current = current->next;
+        }
+        struct Node* temp = current->next;
+        current->next = temp->next;
+        free(temp);
+    }
+}
+
+// Function to search for a node by key
+int searchByKey(struct CircularSinglyLinkedList* list, int key) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return 0;
+    }
+    struct Node* current = list->head;
+    do {
+        if (current->data == key) {
+            return 1;
+        }
+        current = current->next;
+    } while (current != list->head);
+    return 0;
+}
+
+// Function to delete a node by key
+void deleteByKey(struct CircularSinglyLinkedList* list, int key) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* current = list->head;
+    struct Node* prev = NULL;
+    do {
+        if (current->data == key) {
+            if (prev == NULL) { // If the node to be deleted is head
+                while (current->next != list->head) {
+                    current = current->next;
+                }
+                current->next = list->head->next;
+                free(list->head);
+                list->head = current->next;
+                return;
+            } else {
+                prev->next = current->next;
+                free(current);
+                return;
+            }
+        }
+        prev = current;
+        current = current->next;
+    } while (current != list->head);
+    printf("Key not found\n");
+}
+
+// Function to insert a node at the rear
+void insertRear(struct CircularSinglyLinkedList* list, int data) {
+    struct Node* newNode = createNode(data);
+    if (list->head == NULL) {
+        list->head = newNode;
+        newNode->next = list->head;
+    } else {
+        struct Node* current = list->head;
+        while (current->next != list->head) {
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->next = list->head;
+    }
+}
+
+// Function to delete the rear node
+void deleteRear(struct CircularSinglyLinkedList* list) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* current = list->head;
+    struct Node* prev = NULL;
+    while (current->next != list->head) {
+        prev = current;
+        current = current->next;
+    }
+    if (prev != NULL) {
+        prev->next = list->head;
+    } else {
+        list->head = NULL;
+    }
+    free(current);
+}
+
+// Function to delete the front node
+void deleteFront(struct CircularSinglyLinkedList* list) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* current = list->head;
+    struct Node* prev = NULL;
+    while (current->next != list->head) {
+        prev = current;
+        current = current->next;
+    }
+    if (prev != NULL) {
+        prev->next = list->head->next;
+    } else {
+        list->head = list->head->next;
+    }
+    free(list->head);
+    list->head = prev->next;
+}
+
+// Function to search for a node by value
+int searchByValue(struct CircularSinglyLinkedList* list, int value) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return -1;
+    }
+    struct Node* current = list->head;
+    int position = 0;
+    do {
+        if (current->data == value) {
+            return position;
+        }
+        current = current->next;
+        position++;
+    } while (current != list->head);
+    return -1;
+}
+
+// Function to copy a circular singly linked list
+void copyList(struct CircularSinglyLinkedList* source, struct CircularSinglyLinkedList* destination) {
+    if (source->head == NULL) {
+        printf("Source list is empty\n");
+        return;
+    }
+    initCircularSinglyLinkedList(destination);
+    struct Node* current = source->head;
+    do {
+        insertRear(destination, current->data);
+        current = current->next;
+    } while (current != source->head);
+}
+
+// Function to reverse a circular singly linked list
+void reverseList(struct CircularSinglyLinkedList* list) {
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node *prev = NULL, *current = list->head, *next;
+    do {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    } while (current != list->head);
+    list->head->next = prev;
+    list->head = prev;
+}
+
+// Function to display the circular singly linked list
+void display(struct CircularSinglyLinkedList* list)
+{
+    if (list->head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* current = list->head;
+    do {
+        printf("%d ", current->data);
+        current = current->next;
+    } while (current != list->head);
+    printf("\n");
+}
+
+// Function to display the menu
+void displayMenu() {
+    printf("\nMenu:\n");
+    printf("1. Insert by order\n");
+    printf("2. Delete by position\n");
+    printf("3. Search for an item by key\n");
+    printf("4. Delete by key\n");
+    printf("5. Insert rear\n");
+    printf("6. Delete rear\n");
+    printf("7. Delete front\n");
+    printf("8. Search for an item by value\n");
+    printf("9. Copy list\n");
+    printf("10. Reverse list\n");
+    printf("11. Display\n");
+    printf("0. Exit\n");
+}
+
+// Main function
+int main() {
+    struct CircularSinglyLinkedList cll;
+    initCircularSinglyLinkedList(&cll);
+    int choice, data, position, key, value;
+    struct CircularSinglyLinkedList copyListInstance;
+
+    do {
+        displayMenu();
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert by order: ");
+                scanf("%d", &data);
+                insertByOrder(&cll, data);
+                break;
+            case 2:
+                printf("Enter position to delete: ");
+                scanf("%d", &position);
+                deleteByPosition(&cll, position);
+                break;
+            case 3:
+                printf("Enter key to search: ");
+                scanf("%d", &key);
+                if (searchByKey(&cll, key))
+                    printf("Key found\n");
+                else
+                    printf("Key not found\n");
+                break;
+            case 4:
+                printf("Enter key to delete: ");
+                scanf("%d", &key);
+                deleteByKey(&cll, key);
+                break;
+            case 5:
+                printf("Enter data to insert at rear: ");
+                scanf("%d", &data);
+                insertRear(&cll, data);
+                break;
+            case 6:
+                deleteRear(&cll);
+                break;
+            case 7:
+                deleteFront(&cll);
+                break;
+            case 8:
+                printf("Enter value to search: ");
+                scanf("%d", &value);
+                position = searchByValue(&cll, value);
+                if (position == -1)
+                    printf("Value not found\n");
+                else
+                    printf("Value found at position: %d\n", position);
+                break;
+            case 9:
+                copyList(&cll, &copyListInstance);
+                printf("List copied successfully\n");
+                break;
+            case 10:
+                reverseList(&cll);
+                printf("List reversed successfully\n");
+                break;
+            case 11:
+                display(&cll);
+                break;
+            case 0:
+                printf("Exiting program\n");
+                break;
+            default:
+                printf("Invalid choice\n");
+        }
+    } while (choice != 0);
+
+    return 0;
+}
