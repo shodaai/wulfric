@@ -1,0 +1,179 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int key;
+    struct Node *left, *right;
+};
+
+struct Node *createNode(int key) {
+    struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+    newNode->key = key;
+    newNode->left = newNode->right = NULL;
+    return newNode;
+}
+
+struct Node *insert(struct Node *root, int key) {
+    if (root == NULL)
+        return createNode(key);
+
+    if (key < root->key)
+        root->left = insert(root->left, key);
+    else if (key > root->key)
+        root->right = insert(root->right, key);
+
+    return root;
+}
+
+void inorderTraversal(struct Node *root) {
+    if (root != NULL) {
+        inorderTraversal(root->left);
+        printf("%d ", root->key);
+        inorderTraversal(root->right);
+    }
+}
+
+struct Node *search(struct Node *root, int key) {
+    if (root == NULL || root->key == key)
+        return root;
+
+    if (root->key < key)
+        return search(root->right, key);
+
+    return search(root->left, key);
+}
+
+void displayNode(struct Node *node, struct Node *parent) {
+    if (node == NULL)
+        printf("Node not found.\n");
+    else {
+        printf("Node: %d\n", node->key);
+        if (parent != NULL)
+            printf("Parent: %d\n", parent->key);
+        else
+            printf("No parent (root node).\n");
+    }
+}
+
+struct Node *findParent(struct Node *root, struct Node *child) {
+    if (root == NULL || root == child)
+        return NULL;
+
+    if (root->left == child || root->right == child)
+        return root;
+
+    if (child->key < root->key)
+        return findParent(root->left, child);
+    else
+        return findParent(root->right, child);
+}
+
+struct Node *findMaxNode(struct Node *root) {
+    if (root == NULL || root->right == NULL)
+        return root;
+    return findMaxNode(root->right);
+}
+
+struct Node *deleteNode(struct Node *root, int key) {
+    if (root == NULL)
+        return root;
+
+    if (key < root->key)
+        root->left = deleteNode(root->left, key);
+    else if (key > root->key)
+        root->right = deleteNode(root->right, key);
+    else {
+        if (root->left == NULL) {
+            struct Node *temp = root->right;
+            free(root);
+            return temp;
+        } else if (root->right == NULL) {
+            struct Node *temp = root->left;
+            free(root);
+            return temp;
+        }
+
+        struct Node *temp = findMaxNode(root->left);
+        root->key = temp->key;
+        root->left = deleteNode(root->left, temp->key);
+    }
+    return root;
+}
+
+int countNodes(struct Node *root) {
+    if (root == NULL)
+        return 0;
+    return 1 + countNodes(root->left) + countNodes(root->right);
+}
+
+int findHeight(struct Node *root) {
+    if (root == NULL)
+        return -1;
+    int leftHeight = findHeight(root->left);
+    int rightHeight = findHeight(root->right);
+    return (leftHeight > rightHeight ? leftHeight : rightHeight) + 1;
+}
+
+int main() {
+    struct Node *root = NULL;
+    int choice, key;
+    struct Node *foundNode, *parentNode;
+
+    do {
+        printf("\nBinary Search Tree Operations\n");
+        printf("1. Insert\n");
+        printf("2. Inorder Traversal\n");
+        printf("3. Search and Display\n");
+        printf("4. Count Nodes\n");
+        printf("5. Find Height\n");
+        printf("6. Find Node with Maximum Key\n");
+        printf("7. Delete Node\n");
+        printf("8. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter key to insert: ");
+                scanf("%d", &key);
+                root = insert(root, key);
+                break;
+            case 2:
+                printf("Inorder Traversal: ");
+                inorderTraversal(root);
+                printf("\n");
+                break;
+            case 3:
+                printf("Enter key to search: ");
+                scanf("%d", &key);
+                foundNode = search(root, key);
+                parentNode = findParent(root, foundNode);
+                displayNode(foundNode, parentNode);
+                break;
+            case 4:
+                printf("Number of nodes: %d\n", countNodes(root));
+                break;
+            case 5:
+                printf("Height of the tree: %d\n", findHeight(root));
+                break;
+            case 6:
+                foundNode = findMaxNode(root);
+                parentNode = findParent(root, foundNode);
+                displayNode(foundNode, parentNode);
+                break;
+            case 7:
+                printf("Enter key to delete: ");
+                scanf("%d", &key);
+                root = deleteNode(root, key);
+                printf("Node deleted successfully.\n");
+                break;
+            case 8:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice! Please enter a number between 1 and 8.\n");
+        }
+    } while (choice != 8);
+
+    return 0;
+}
