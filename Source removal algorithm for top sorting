@@ -1,0 +1,148 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int i, j, n, Queue[10], f = 0, r = -1, opc = 0;
+int indegree[10], inqueue[10], a[10][10];
+
+void topsort() {
+    int source, num = n, flag = 0;
+    printf("Topological sorting: ");
+    while (num > 0) {
+        flag = 0; // Reset flag for each iteration
+        for (i = 1; i <= n; i++) {
+            if (indegree[i] == 0 && inqueue[i] == 0) {
+                inqueue[i] = 1;
+                Queue[++r] = i;
+                flag = 1;
+            }
+        }
+        if (flag == 0) {
+            printf("Not possible\n");
+            break;
+        }
+        source = Queue[f++];
+        indegree[source] = -1;
+        printf("%d ", source);
+        num--;
+        for (i = 1; i <= n; i++) {
+            if (a[source][i] == 1) {
+                indegree[i]--;
+                opc++;
+            }
+        }
+        opc++;
+    }
+    printf("\n");
+}
+
+void calindegree() {
+    for (i = 1; i <= n; i++) {
+        for (j = 1; j <= n; j++) {
+            if (a[i][j]) {
+                indegree[j]++;
+            }
+            opc++;
+        }
+        opc++;
+    }
+}
+
+void generateBestCase(int vertices) {
+    FILE *file = fopen("best_case.txt", "w");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    fprintf(file, "%d\n", vertices);
+    for (i = 1; i <= vertices; i++) {
+        for (j = 1; j <= vertices; j++) {
+            if (i != j && i < j) {
+                fprintf(file, "1 ");
+            } else {
+                fprintf(file, "0 ");
+            }
+        }
+        fprintf(file, "\n");
+    }
+    fclose(file);
+}
+
+void generateWorstCase(int vertices) {
+    FILE *file = fopen("worst_case.txt", "w");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    fprintf(file, "%d\n", vertices);
+    for (i = 1; i <= vertices; i++) {
+        for (j = 1; j <= vertices; j++) {
+            if (i != j && i > j) {
+                fprintf(file, "1 ");
+            } else {
+                fprintf(file, "0 ");
+            }
+        }
+        fprintf(file, "\n");
+    }
+    fclose(file);
+}
+
+void runTest(char *filename) {
+    FILE *file = fopen(filename, "r");
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    fscanf(file, "%d", &n);
+    for (i = 1; i <= n; i++) {
+        for (j = 1; j <= n; j++) {
+            fscanf(file, "%d", &a[i][j]);
+        }
+    }
+    fclose(file);
+
+    for (i = 1; i <= n; i++) {
+        indegree[i] = 0;
+        inqueue[i] = 0;
+    }
+
+    f = 0;
+    r = -1;
+    opc = 0;
+
+    calindegree();
+    topsort();
+}
+
+int main() {
+    int vertices = 4;
+
+    generateBestCase(vertices);
+    generateWorstCase(vertices);
+
+    printf("Best Case:\n");
+    runTest("best_case.txt");
+    printf("Operation count (best case): %d\n", opc);
+
+    FILE *best_file = fopen("best_case_operations.txt", "w");
+    if (best_file == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+    fprintf(best_file, "Operation count (best case): %d\n", opc);
+    fclose(best_file);
+
+    printf("Worst Case:\n");
+    runTest("worst_case.txt");
+    printf("Operation count (worst case): %d\n", opc);
+
+    FILE *worst_file = fopen("worst_case_operations.txt", "w");
+    if (worst_file == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+    fprintf(worst_file, "Operation count (worst case): %d\n", opc);
+    fclose(worst_file);
+
+    return 0;
+}
