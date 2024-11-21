@@ -1,0 +1,142 @@
+-- Create STUDENT Table
+CREATE TABLE STUDENT (
+    regno VARCHAR(20) PRIMARY KEY,
+    name VARCHAR(50),
+    major VARCHAR(50),
+    bdate DATE
+);
+
+-- Create COURSE Table
+CREATE TABLE COURSE (
+    course# INT PRIMARY KEY,
+    cname VARCHAR(50),
+    dept VARCHAR(50)
+);
+
+-- Create ENROLL Table
+CREATE TABLE ENROLL (
+    regno VARCHAR(20),
+    course# INT,
+    sem INT,
+    marks INT,
+    PRIMARY KEY (regno, course#),
+    FOREIGN KEY (regno) REFERENCES STUDENT(regno),
+    FOREIGN KEY (course#) REFERENCES COURSE(course#)
+);
+
+-- Create BOOK_ADOPTION Table
+CREATE TABLE BOOK_ADOPTION (
+    course# INT,
+    sem INT,
+    book_ISBN INT,
+    PRIMARY KEY (course#, sem),
+    FOREIGN KEY (course#) REFERENCES COURSE(course#)
+);
+
+-- Create TEXT Table
+CREATE TABLE TEXT (
+    book_ISBN INT PRIMARY KEY,
+    book_title VARCHAR(100),
+    publisher VARCHAR(50),
+    author VARCHAR(50)
+);
+
+-- Insert data into STUDENT
+INSERT INTO STUDENT VALUES ('R001', 'Alice', 'CS', '2000-01-01');
+INSERT INTO STUDENT VALUES ('R002', 'Bob', 'IT', '1999-05-15');
+INSERT INTO STUDENT VALUES ('R003', 'Charlie', 'EE', '1998-10-20');
+INSERT INTO STUDENT VALUES ('R004', 'Diana', 'ME', '1997-07-25');
+INSERT INTO STUDENT VALUES ('R005', 'Eve', 'CE', '1996-12-10');
+
+-- Insert data into COURSE
+INSERT INTO COURSE VALUES (101, 'Databases', 'CS');
+INSERT INTO COURSE VALUES (102, 'Networks', 'IT');
+INSERT INTO COURSE VALUES (103, 'Circuits', 'EE');
+INSERT INTO COURSE VALUES (104, 'Mechanics', 'ME');
+INSERT INTO COURSE VALUES (105, 'Structures', 'CE');
+
+-- Insert data into TEXT
+INSERT INTO TEXT VALUES (1001, 'Database Systems', 'Pearson', 'Navathe');
+INSERT INTO TEXT VALUES (1002, 'Computer Networks', 'McGraw-Hill', 'Tanenbaum');
+INSERT INTO TEXT VALUES (1003, 'Circuits and Signals', 'Oxford', 'Haykin');
+INSERT INTO TEXT VALUES (1004, 'Mechanics of Materials', 'Cengage', 'Hibbeler');
+INSERT INTO TEXT VALUES (1005, 'Structural Analysis', 'Prentice Hall', 'Hibbeler');
+
+-- Insert data into BOOK_ADOPTION
+INSERT INTO BOOK_ADOPTION VALUES (101, 1, 1001);
+INSERT INTO BOOK_ADOPTION VALUES (102, 1, 1002);
+INSERT INTO BOOK_ADOPTION VALUES (103, 1, 1003);
+INSERT INTO BOOK_ADOPTION VALUES (104, 1, 1004);
+INSERT INTO BOOK_ADOPTION VALUES (105, 1, 1005);
+
+-- Insert data into ENROLL
+INSERT INTO ENROLL VALUES ('R001', 101, 1, 85);
+INSERT INTO ENROLL VALUES ('R002', 102, 1, 90);
+INSERT INTO ENROLL VALUES ('R003', 103, 1, 75);
+INSERT INTO ENROLL VALUES ('R004', 104, 1, 80);
+INSERT INTO ENROLL VALUES ('R005', 105, 1, 95);
+
+-- Alter table to add a new column
+ALTER TABLE STUDENT ADD phone_number VARCHAR(15);
+
+-- Update data in COURSE
+UPDATE COURSE SET cname = 'Advanced Databases' WHERE course# = 101;
+
+-- Delete a record from ENROLL
+DELETE FROM ENROLL WHERE regno = 'R005';
+
+-- Create EMPLOYEE Table
+CREATE TABLE EMPLOYEE (
+    SSN INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Address VARCHAR(100),
+    Sex CHAR(1),
+    Salary INT,
+    SuperSSN INT,
+    DNo INT,
+    FOREIGN KEY (DNo) REFERENCES DEPARTMENT(DNo)
+);
+
+-- Create DEPARTMENT Table
+CREATE TABLE DEPARTMENT (
+    DNo INT PRIMARY KEY,
+    DName VARCHAR(50),
+    MgrSSN INT,
+    MgrStartDate DATE
+);
+
+-- Create DLOCATION Table
+CREATE TABLE DLOCATION (
+    DNo INT,
+    DLoc VARCHAR(100),
+    PRIMARY KEY (DNo, DLoc),
+    FOREIGN KEY (DNo) REFERENCES DEPARTMENT(DNo)
+);
+
+-- Create PROJECT Table
+CREATE TABLE PROJECT (
+    PNo INT PRIMARY KEY,
+    PName VARCHAR(50),
+    PLocation VARCHAR(50),
+    DNo INT,
+    FOREIGN KEY (DNo) REFERENCES DEPARTMENT(DNo)
+);
+
+-- Create WORKS_ON Table
+CREATE TABLE WORKS_ON (
+    SSN INT,
+    PNo INT,
+    Hours INT,
+    PRIMARY KEY (SSN, PNo),
+    FOREIGN KEY (SSN) REFERENCES EMPLOYEE(SSN),
+    FOREIGN KEY (PNo) REFERENCES PROJECT(PNo)
+);
+
+-- Insert data into DEPARTMENT
+INSERT INTO DEPARTMENT VALUES (1, 'HR', 101, '2020-01-01');
+INSERT INTO DEPARTMENT VALUES (2, 'IT', 102, '2021-02-01');
+INSERT INTO DEPARTMENT VALUES (3, 'Finance', 103, '2022-03-01');
+
+-- Insert data into EMPLOYEE
+INSERT INTO EMPLOYEE VALUES (101, 'Alice', '123 Main St', 'F', 50000, NULL, 1);
+INSERT INTO EMPLOYEE VALUES (102, 'Bob', '456 Park Ave',
