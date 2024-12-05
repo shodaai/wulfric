@@ -1,0 +1,52 @@
+-- Create the Database
+CREATE DATABASE CompanyDB;
+USE CompanyDB;
+
+-- Create Tables
+CREATE TABLE departments (
+    department_id INT AUTO_INCREMENT PRIMARY KEY,
+    department_name VARCHAR(100)
+);
+
+CREATE TABLE employees (
+    employee_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100),
+    department_id INT,
+    salary DECIMAL(10, 2),
+    hire_date DATE,
+    FOREIGN KEY (department_id) REFERENCES departments(department_id)
+);
+
+CREATE TABLE projects (
+    project_id INT AUTO_INCREMENT PRIMARY KEY,
+    employee_id INT,
+    project_name VARCHAR(100),
+    FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
+);
+
+-- Insert Data into departments
+INSERT INTO departments (department_name) VALUES
+('HR'),
+('Finance'),
+('Sales'),
+('Engineering');
+
+-- Insert Data into employees
+INSERT INTO employees (name, department_id, salary, hire_date) VALUES
+('John Smith', 1, 60000, '2020-01-15'),
+('Jane Doe', 2, 75000, '2019-03-22'),
+('Alice Johnson', 3, 50000, '2021-05-10'),
+('Bob Brown', 4, 90000, '2018-11-30'),
+('Charlie Davis', 3, 52000, '2022-07-18');
+
+-- Insert Data into projects
+INSERT INTO projects (employee_id, project_name) VALUES
+(1, 'Recruitment'),
+(2, 'Budget Planning'),
+(4, 'Product Development'),
+(3, 'Client Acquisition');
+
+-- Verify Data
+SELECT * FROM departments;
+SELECT * FROM employees;
+SELECT * FROM projects;
